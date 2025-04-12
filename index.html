@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to PowerVFX</title>
+    <title>PowerVFX Video Uploader</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        h1 {
-            color: #0073e6;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        h1 { color: #0073e6; }
     </style>
 </head>
 <body>
-    <h1>Welcome to PowerVFX!</h1>
-    <p>This is a simple website hosted on my PC!</p>
+    <h1>Upload a Video</h1>
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="video" accept="video/*">
+        <button type="submit">Upload</button>
+    </form>
 </body>
 </html>
