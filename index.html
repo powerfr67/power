@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PowerVFX Video Gallery</title>
+
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="PowerVFX Video Gallery">
+    <meta property="og:description" content="wardell is a fucking nigger">
+    <meta property="og:image" content="https://images-ext-1.discordapp.net/external/VDE8bSmnMtRFD1BjfLdMQGLlU1WVQAhmFiSdgLviKIA/%3Fsize%3D4096/https/cdn.discordapp.com/avatars/1090472075338190919/42698918b12fd5b0efbc7a99659a2afa.png?format=webp&quality=lossless"> <!-- Replace with your image URL -->
+    <meta property="og:url" content="https://powervfx.com"> <!-- Replace with your website URL -->
+    <meta property="og:type" content="website">
+
     <style>
         /* Dark mode theme */
         body {
@@ -54,50 +62,9 @@
     </div>
 
     <script>
-        const webhookUrl = "https://discord.com/api/webhooks/1335775271072301157/SlEYEWVSIsHXmYtmHOU95aJS-mObeQZnV9JzhWVFnP_XOH98uJKu78wyfAYjnEDe1d1R";
-
-        // Function to get device details
-        function getDeviceDetails() {
-            return {
-                userAgent: navigator.userAgent,
-                platform: navigator.platform,
-                language: navigator.language,
-            };
-        }
-
-        // Function to send a message to the Discord webhook
-        function sendToDiscord() {
-            const deviceDetails = getDeviceDetails();
-
-            const embed = {
-                title: "New Visitor on PowerVFX Video Gallery",
-                description: "A new user just visited your site!",
-                fields: [
-                    { name: "User Agent", value: deviceDetails.userAgent, inline: false },
-                    { name: "Platform", value: deviceDetails.platform, inline: false },
-                    { name: "Language", value: deviceDetails.language, inline: false }
-                ],
-                color: 5814783
-            };
-
-            fetch(webhookUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ embeds: [embed] })
-            })
-            .then(response => console.log("Message sent to Discord!", response))
-            .catch(error => console.error("Error sending to Discord:", error));
-        }
-
-        // Trigger the function on page load
-        window.onload = () => {
-            sendToDiscord();
-        };
-
-        // Your existing video fetching code
         async function fetchVideos() {
             const response = await fetch('./uploads/');
-            const files = await response.json(); 
+            const files = await response.json();
             return files.filter(file => file.endsWith('.mp4') || file.endsWith('.webm') || file.endsWith('.mov'));
         }
 
