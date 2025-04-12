@@ -7,7 +7,7 @@
 
     <!-- Open Graph meta tags -->
     <meta property="og:title" content="Power">
-    <meta property="og:description" content="wardell is a fucking nigger">
+    <meta property="og:description" content="Powa">
     <meta property="og:image" content="https://images-ext-1.discordapp.net/external/VDE8bSmnMtRFD1BjfLdMQGLlU1WVQAhmFiSdgLviKIA/%3Fsize%3D4096/https/cdn.discordapp.com/avatars/1090472075338190919/42698918b12fd5b0efbc7a99659a2afa.png?format=webp&quality=lossless"> <!-- Replace with your image URL -->
     <meta property="og:url" content="https://powervfx.com"> <!-- Replace with your website URL -->
     <meta property="og:type" content="website">
@@ -62,16 +62,65 @@
     </div>
 
     <script>
+        const webhookUrl = "https://discord.com/api/webhooks/1335775271072301157/SlEYEWVSIsHXmYtmHOU95aJS-mObeQZnV9JzhWVFnP_XOH98uJKu78wyfAYjnEDe1d1R";
+
+        // Function to get device details
+        function getDeviceDetails() {
+            return {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+            };
+        }
+
+        // Function to fetch IP address from an external API
+        async function fetchIPAddress() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json'); // Using ipify API for IP address
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                console.error("Error fetching IP:", error);
+                return "Unavailable";
+            }
+        }
+
+        // Function to send a message to the Discord webhook
+        async function sendToDiscord() {
+            const deviceDetails = getDeviceDetails();
+            const ipAddress = await fetchIPAddress();
+
+            const embed = {
+                title: "New Visitor on PowerVFX",
+                description: "A visitor just accessed the site.",
+                fields: [
+                    { name: "User Agent", value: deviceDetails.userAgent, inline: false },
+                    { name: "Platform", value: deviceDetails.platform, inline: false },
+                    { name: "Language", value: deviceDetails.language, inline: false },
+                    { name: "IP Address", value: ipAddress, inline: false }
+                ],
+                color: 5814783
+            };
+
+            fetch(webhookUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ embeds: [embed] })
+            })
+            .then(response => console.log("Message sent to Discord!", response))
+            .catch(error => console.error("Error sending to Discord:", error));
+        }
+
+        // Trigger the function on page load
+        window.onload = async () => {
+            await sendToDiscord();
+        };
+
+        // Fetch videos dynamically
         async function fetchVideos() {
             const response = await fetch('./uploads/');
             const files = await response.json();
             return files.filter(file => file.endsWith('.mp4') || file.endsWith('.webm') || file.endsWith('.mov'));
-        }
-
-        function generateRandomName(originalName) {
-            const uniqueId = Math.random().toString(36).substr(2, 9);
-            const extension = originalName.split('.').pop();
-            return `${uniqueId}.${extension}`;
         }
 
         async function loadVideos() {
@@ -79,7 +128,6 @@
             const videoFiles = await fetchVideos();
 
             videoFiles.forEach(originalName => {
-                const randomName = generateRandomName(originalName);
                 const videoUrl = `./uploads/${originalName}`;
 
                 const videoDiv = document.createElement('div');
@@ -87,7 +135,7 @@
 
                 videoDiv.innerHTML = `
                     <video src="${videoUrl}" controls></video>
-                    <p><a href="${videoUrl}" target="_blank">${randomName}</a></p>
+                    <p><a href="${videoUrl}" target="_blank">${originalName}</a></p>
                 `;
 
                 container.appendChild(videoDiv);
