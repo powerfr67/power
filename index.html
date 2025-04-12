@@ -1,95 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerVFX Video Uploader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        h1 {
+            color: #0073e6;
+        }
+        .instructions {
+            margin: 20px auto;
+            text-align: left;
+            max-width: 600px;
+        }
+        .link {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload Videos to PowerVFX</h1>
+    <p>Follow the steps below to upload and generate a shareable link:</p>
 
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PowerVFX Video Uploader</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                text-align: center;
-                margin: 50px;
+    <div class="instructions">
+        <ol>
+            <li>Go to your <strong>GitHub repository</strong> for PowerVFX.</li>
+            <li>Navigate to the <strong>uploads</strong> folder (or create one if it doesn’t exist).</li>
+            <li>Click <strong>Add file</strong> > <strong>Upload files</strong>.</li>
+            <li>Drag and drop your video file (e.g., <code>my-video.mp4</code>).</li>
+            <li>Commit the changes by clicking <strong>Commit to main</strong>.</li>
+            <li>Copy the URL of the uploaded file, which will look like this:
+                <br><code>https://yourusername.github.io/your-repo/uploads/my-video.mp4</code></li>
+        </ol>
+    </div>
+
+    <form id="generateLinkForm">
+        <input type="text" id="fileName" placeholder="Enter file name (e.g., my-video.mp4)" required>
+        <button type="submit">Generate Link</button>
+    </form>
+    <div id="link" class="link" style="display: none;">
+        <p><strong>Shareable Link:</strong></p>
+        <a id="videoLink" href="#" target="_blank"></a>
+    </div>
+
+    <script>
+        const form = document.getElementById('generateLinkForm');
+        const videoLink = document.getElementById('videoLink');
+        const linkDiv = document.getElementById('link');
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent form refresh
+            const fileName = document.getElementById('fileName').value.trim();
+            if (fileName) {
+                const baseUrl = "https://yourusername.github.io/your-repo/uploads/";
+                const fullUrl = `${baseUrl}${fileName}`;
+                videoLink.href = fullUrl;
+                videoLink.textContent = fullUrl;
+                linkDiv.style.display = 'block'; // Show the generated link
+            } else {
+                alert("Please enter a valid file name!");
             }
-            h1 {
-                color: #0073e6;
-            }
-            .video-link {
-                margin-top: 20px;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Upload a Video to PowerVFX</h1>
-        <p>Upload your video, and we'll save it to the GitHub repository!</p>
-        <form id="uploadForm">
-            <input type="file" id="videoFile" accept="video/*" required>
-            <button type="submit">Upload</button>
-        </form>
-        <div id="response" class="video-link" style="display: none;">
-            <p><strong>Uploaded Successfully! View it on GitHub:</strong></p>
-            <a id="videoLink" href="#" target="_blank"></a>
-        </div>
-    
-        <script>
-            const form = document.getElementById('uploadForm');
-            const videoFile = document.getElementById('videoFile');
-            const responseDiv = document.getElementById('response');
-            const videoLink = document.getElementById('videoLink');
-    
-            // GitHub API Config
-            const GITHUB_API_URL = 'https://api.github.com';
-            const OWNER = 'powerfr67'; // Replace with your GitHub username
-            const REPO = 'power'; // Replace with your GitHub repository name
-            const BRANCH = 'main'; // Replace with your branch name
-            const TOKEN = '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'; // Replace with your GitHub personal access token
-    
-            form.addEventListener('submit', async (event) => {
-                event.preventDefault(); // Prevent the default form behavior
-    
-                if (!videoFile.files[0]) {
-                    alert('Please select a video file to upload!');
-                    return;
-                }
-    
-                const file = videoFile.files[0];
-                const fileName = `${Date.now()}-${file.name}`;
-                const reader = new FileReader();
-    
-                reader.onload = async function () {
-                    const fileContent = btoa(reader.result); // Encode file as base64
-    
-                    try {
-                        const response = await fetch(`${GITHUB_API_URL}/repos/${OWNER}/${REPO}/contents/uploads/${fileName}`, {
-                            method: 'PUT',
-                            headers: {
-                                Authorization: `Bearer ${TOKEN}`,
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                message: `Adding ${fileName}`,
-                                content: fileContent,
-                                branch: BRANCH,
-                            }),
-                        });
-    
-                        if (response.ok) {
-                            const data = await response.json();
-                            videoLink.href = data.content.html_url;
-                            videoLink.textContent = data.content.html_url;
-                            responseDiv.style.display = 'block';
-                        } else {
-                            const errorData = await response.json();
-                            alert(`Error: ${errorData.message}`);
-                        }
-                    } catch (error) {
-                        alert('An error occurred while uploading. Please try again.');
-                        console.error(error);
-                    }
-                };
-    
-                reader.readAsBinaryString(file); // Read file as binary string for encoding
-            });
-        </script>
-    </body>
-    </html>
+        });
+    </script>
+</body>
+</html>
