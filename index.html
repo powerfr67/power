@@ -1,63 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PowerVFX Video Uploader</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px;
-        }
-        h1 {
-            color: #0073e6;
-        }
-        .video-link {
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Upload a Video to PowerVFX</h1>
-    <p>Upload your video and get a shareable link!</p>
-    <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
-        <input type="file" name="video" accept="video/*" required>
-        <button type="submit">Upload</button>
-    </form>
-    <div id="response" class="video-link" style="display: none;">
-        <p><strong>Shareable Link:</strong></p>
-        <a id="videoLink" href="#" target="_blank"></a>
-    </div>
 
-    <script>
-        const form = document.getElementById('uploadForm');
-        const responseDiv = document.getElementById('response');
-        const videoLink = document.getElementById('videoLink');
-
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault(); // Prevent the default form submission behavior
-            const formData = new FormData(form);
-
-            try {
-                // Make a POST request to the /upload route
-                const response = await fetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    videoLink.href = data.fileUrl;
-                    videoLink.textContent = data.fileUrl;
-                    responseDiv.style.display = 'block'; // Show the shareable link
-                } else {
-                    alert('Error uploading video. Please try again.');
-                }
-            } catch (error) {
-                alert('An error occurred. Please check your connection and try again.');
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PowerVFX Video Uploader</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                margin: 50px;
             }
-        });
-    </script>
-</body>
-</html>
+            h1 {
+                color: #0073e6;
+            }
+            .video-link {
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Upload a Video to PowerVFX</h1>
+        <p>Upload your video, and we'll save it to the GitHub repository!</p>
+        <form id="uploadForm">
+            <input type="file" id="videoFile" accept="video/*" required>
+            <button type="submit">Upload</button>
+        </form>
+        <div id="response" class="video-link" style="display: none;">
+            <p><strong>Uploaded Successfully! View it on GitHub:</strong></p>
+            <a id="videoLink" href="#" target="_blank"></a>
+        </div>
+    
+        <script>
+            const form = document.getElementById('uploadForm');
+            const videoFile = document.getElementById('videoFile');
+            const responseDiv = document.getElementById('response');
+            const videoLink = document.getElementById('videoLink');
+    
+            // GitHub API Config
+            const GITHUB_API_URL = 'https://api.github.com';
+            const OWNER = 'powerfr67'; // Replace with your GitHub username
+            const REPO = 'power'; // Replace with your GitHub repository name
+            const BRANCH = 'main'; // Replace with your branch name
+            const TOKEN = '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'; // Replace with your GitHub personal access token
+    
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Prevent the default form behavior
+    
+                if (!videoFile.files[0]) {
+                    alert('Please select a video file to upload!');
+                    return;
+                }
+    
+                const file = videoFile.files[0];
+                const fileName = `${Date.now()}-${file.name}`;
+                const reader = new FileReader();
+    
+                reader.onload = async function () {
+                    const fileContent = btoa(reader.result); // Encode file as base64
+    
+                    try {
+                        const response = await fetch(`${GITHUB_API_URL}/repos/${OWNER}/${REPO}/contents/uploads/${fileName}`, {
+                            method: 'PUT',
+                            headers: {
+                                Authorization: `Bearer ${TOKEN}`,
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                message: `Adding ${fileName}`,
+                                content: fileContent,
+                                branch: BRANCH,
+                            }),
+                        });
+    
+                        if (response.ok) {
+                            const data = await response.json();
+                            videoLink.href = data.content.html_url;
+                            videoLink.textContent = data.content.html_url;
+                            responseDiv.style.display = 'block';
+                        } else {
+                            const errorData = await response.json();
+                            alert(`Error: ${errorData.message}`);
+                        }
+                    } catch (error) {
+                        alert('An error occurred while uploading. Please try again.');
+                        console.error(error);
+                    }
+                };
+    
+                reader.readAsBinaryString(file); // Read file as binary string for encoding
+            });
+        </script>
+    </body>
+    </html>
