@@ -5,15 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PowerVFX Video Uploader</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        h1 { color: #0073e6; }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        h1 {
+            color: #0073e6;
+        }
+        .video-link {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
-    <h1>Upload a Video</h1>
-    <form action="/upload" method="POST" enctype="multipart/form-data">
-        <input type="file" name="video" accept="video/*">
+    <h1>Upload a Video to PowerVFX</h1>
+    <p>Upload your video and get a shareable link!</p>
+    <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="video" accept="video/*" required>
         <button type="submit">Upload</button>
     </form>
+    <div id="response" class="video-link" style="display: none;">
+        <p><strong>Shareable Link:</strong></p>
+        <a id="videoLink" href="#" target="_blank"></a>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const responseDiv = document.getElementById('response');
+        const videoLink = document.getElementById('videoLink');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent the default form submission behavior
+            const formData = new FormData(form);
+
+            try {
+                // Make a POST request to the /upload route
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    videoLink.href = data.fileUrl;
+                    videoLink.textContent = data.fileUrl;
+                    responseDiv.style.display = 'block'; // Show the shareable link
+                } else {
+                    alert('Error uploading video. Please try again.');
+                }
+            } catch (error) {
+                alert('An error occurred. Please check your connection and try again.');
+            }
+        });
+    </script>
 </body>
 </html>
