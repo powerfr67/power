@@ -3,96 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PowerVFX</title>
+    <meta name="theme-color" content="#000000">
 
-    <!-- Open Graph meta tags -->
-    <meta property="og:title" content="PowerVFX Video Gallery">
-    <meta property="og:description" content="Explore stunning videos on PowerVFX and unleash your creativity!">
-    <meta property="og:url" content="https://powervfx.com"> <!-- Replace with your website URL -->
+    <!-- Open Graph meta tags for Discord embedding -->
+    <meta property="og:title" content="My Black Site">
+    <meta property="og:description" content="Just a simple black site with an intriguing vibe.">
+    <meta property="og:image" content="https://github.com/powerfr67/power/blob/main/2.png">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://powervfx.com">
 
+    <title>My Black Site</title>
     <style>
-        /* Dark mode theme */
         body {
-            background-color: #121212;
-            color: #FFFFFF;
-            font-family: 'Poppins', sans-serif;
             margin: 0;
-            padding: 0;
-        }
-        h1 {
-            text-align: center;
-            margin: 20px;
-            color: #00ADB5;
-        }
-        .container {
+            background-color: black;
+            color: white;
             display: flex;
-            flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
-            padding: 20px;
-        }
-        .video-item {
-            background: #1E1E1E;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 10px;
-            max-width: 300px;
-            text-align: center;
-        }
-        video {
-            width: 100%;
-            border-radius: 4px;
-        }
-        a {
-            color: #00ADB5;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>PowerVFX Video Gallery</h1>
-    <div class="container" id="video-container">
-        <!-- Videos will be loaded dynamically here -->
-    </div>
-
-    <script>
-        async function fetchVideos() {
-            const response = await fetch('./uploads/');
-            const files = await response.json();
-            return files.filter(file => file.endsWith('.mp4') || file.endsWith('.webm') || file.endsWith('.mov'));
-        }
-
-        function generateRandomName(originalName) {
-            const uniqueId = Math.random().toString(36).substr(2, 9);
-            const extension = originalName.split('.').pop();
-            return `${uniqueId}.${extension}`;
-        }
-
-        async function loadVideos() {
-            const container = document.getElementById('video-container');
-            const videoFiles = await fetchVideos();
-
-            videoFiles.forEach(originalName => {
-                const videoUrl = `./uploads/${originalName}`;
-
-                const videoDiv = document.createElement('div');
-                videoDiv.className = 'video-item';
-
-                videoDiv.innerHTML = `
-                    <video src="${videoUrl}" controls></video>
-                    <p><a href="${videoUrl}" target="_blank">${originalName}</a></p>
-                `;
-
-                container.appendChild(videoDiv);
-            });
-        }
-
-        loadVideos();
-    </script>
+    <h1>Welcome to the Void</h1>
 </body>
 </html>
