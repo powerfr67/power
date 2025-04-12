@@ -54,26 +54,43 @@
     </div>
 
     <script>
-        // Example video list (replace with actual filenames from your server)
-        const videoFiles = [
-            "example1.mp4", 
-            "example2.mp4", 
-            "example3.mp4"
-        ];
+        // Fetch the videos dynamically from the server
+        async function fetchVideos() {
+            const response = await fetch('./uploads/');
+            const files = await response.json(); // Fetch filenames from server-side
+            return files.filter(file => file.endsWith('.mp4') || file.endsWith('.webm') || file.endsWith('.mov'));
+        }
 
-        const basePath = "./uploads/"; // Path to the videos folder
-        const container = document.getElementById("video-container");
+        // Generate random unique names for videos
+        function generateRandomName(originalName) {
+            const uniqueId = Math.random().toString(36).substr(2, 9);
+            const extension = originalName.split('.').pop(); // Get file extension
+            return `${uniqueId}.${extension}`;
+        }
 
-        // Dynamically load videos into the page
-        videoFiles.forEach(file => {
-            const videoDiv = document.createElement("div");
-            videoDiv.className = "video-item";
-            videoDiv.innerHTML = `
-                <video src="${basePath}${file}" controls></video>
-                <p><a href="${basePath}${file}" target="_blank">${file}</a></p>
-            `;
-            container.appendChild(videoDiv);
-        });
+        async function loadVideos() {
+            const container = document.getElementById('video-container');
+            const videoFiles = await fetchVideos();
+
+            // Generate videos dynamically
+            videoFiles.forEach(originalName => {
+                const randomName = generateRandomName(originalName);
+                const videoUrl = `./uploads/${originalName}`;
+
+                const videoDiv = document.createElement('div');
+                videoDiv.className = 'video-item';
+
+                videoDiv.innerHTML = `
+                    <video src="${videoUrl}" controls></video>
+                    <p><a href="${videoUrl}" target="_blank">${randomName}</a></p>
+                `;
+
+                container.appendChild(videoDiv);
+            });
+        }
+
+        // Load videos on page load
+        loadVideos();
     </script>
 </body>
 </html>
