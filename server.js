@@ -1,32 +1,49 @@
-const http = require('http');
-const fs = require('fs');
+const express = require('express');
+const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
-// Server port and host
-const PORT = 80; // Default HTTP port
-const HOST = '0.0.0.0'; // Accept connections from any IP address
+const app = express();
+const PORT = 3000; // Change to 80 if hosting publicly
 
-const server = http.createServer((req, res) => {
-    if (req.url === '/' || req.url === '/index.html') {
-        // Serve the HTML file
-        const filePath = path.join(__dirname, 'index.html');
-        fs.readFile(filePath, (err, content) => {
-            if (err) {
-                res.writeHead(500, { 'Content-Type': 'text/plain' });
-                res.end('Server Error');
-            } else {
-                res.writeHead(200, { 'Content-Type': 'text/html' });
-                res.end(content);
-            }
-        });
-    } else {
-        // Handle 404
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('404: Page Not Found');
+// Storage configuration
+const storage = multer.diskStorage({
+    destination: 'uploads/',
+    filename: (req, file, cb) => {
+        const uniqueName = Date.now() + '-' + file.originalname;
+        cb(null, uniqueName);
     }
 });
+const upload = multer({ storage });
 
-// Start the server
-server.listen(PORT, HOST, () => {
-    console.log(`Server is running at http://${HOST}:${PORT}/`);
+// Ensure uploads directory exists
+if (!fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads');
+}
+
+// Serve static files (videos)
+app.use('/videos', express.static(path.join(__dirname, 'uploads')));
+
+// Upload endpoint
+app.post('/upload', upload.single('video'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+    const fileUrl = `https://powervfx.com/videos/${req.file.filename}`;
+    res.json({ success: true, fileUrl });
+});
+
+// Homepage with upload form
+app.get('/', (req, res) => {
+    res.send(`
+        <h1>Upload a Video</h1>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="file" name="video" accept="video/*">
+            <button type="submit">Upload</button>
+        </form>
+    `);
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
