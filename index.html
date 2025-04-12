@@ -3,69 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PowerVFX Video Uploader</title>
+    <title>PowerVFX Video Gallery</title>
     <style>
+        /* Dark mode theme */
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px;
+            background-color: #121212;
+            color: #FFFFFF;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
         }
         h1 {
-            color: #0073e6;
+            text-align: center;
+            margin: 20px;
+            color: #00ADB5;
         }
-        .instructions {
-            margin: 20px auto;
-            text-align: left;
-            max-width: 600px;
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
         }
-        .link {
-            margin-top: 20px;
-            font-size: 18px;
+        .video-item {
+            background: #1E1E1E;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 10px;
+            max-width: 300px;
+            text-align: center;
+        }
+        video {
+            width: 100%;
+            border-radius: 4px;
+        }
+        a {
+            color: #00ADB5;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Upload Videos to PowerVFX</h1>
-    <p>Follow the steps below to upload and generate a shareable link:</p>
-
-    <div class="instructions">
-        <ol>
-            <li>Go to your <strong>GitHub repository</strong> for PowerVFX.</li>
-            <li>Navigate to the <strong>uploads</strong> folder (or create one if it doesn’t exist).</li>
-            <li>Click <strong>Add file</strong> > <strong>Upload files</strong>.</li>
-            <li>Drag and drop your video file (e.g., <code>my-video.mp4</code>).</li>
-            <li>Commit the changes by clicking <strong>Commit to main</strong>.</li>
-            <li>Copy the URL of the uploaded file, which will look like this:
-                <br><code>https://yourusername.github.io/your-repo/uploads/my-video.mp4</code></li>
-        </ol>
-    </div>
-
-    <form id="generateLinkForm">
-        <input type="text" id="fileName" placeholder="Enter file name (e.g., my-video.mp4)" required>
-        <button type="submit">Generate Link</button>
-    </form>
-    <div id="link" class="link" style="display: none;">
-        <p><strong>Shareable Link:</strong></p>
-        <a id="videoLink" href="#" target="_blank"></a>
+    <h1>PowerVFX Video Gallery</h1>
+    <div class="container" id="video-container">
+        <!-- Videos will be loaded dynamically here -->
     </div>
 
     <script>
-        const form = document.getElementById('generateLinkForm');
-        const videoLink = document.getElementById('videoLink');
-        const linkDiv = document.getElementById('link');
+        // Example video list (replace with actual filenames from your server)
+        const videoFiles = [
+            "example1.mp4", 
+            "example2.mp4", 
+            "example3.mp4"
+        ];
 
-        form.addEventListener('submit', (event) => {
-            event.preventDefault(); // Prevent form refresh
-            const fileName = document.getElementById('fileName').value.trim();
-            if (fileName) {
-                const baseUrl = "https://yourusername.github.io/your-repo/uploads/";
-                const fullUrl = `${baseUrl}${fileName}`;
-                videoLink.href = fullUrl;
-                videoLink.textContent = fullUrl;
-                linkDiv.style.display = 'block'; // Show the generated link
-            } else {
-                alert("Please enter a valid file name!");
-            }
+        const basePath = "./uploads/"; // Path to the videos folder
+        const container = document.getElementById("video-container");
+
+        // Dynamically load videos into the page
+        videoFiles.forEach(file => {
+            const videoDiv = document.createElement("div");
+            videoDiv.className = "video-item";
+            videoDiv.innerHTML = `
+                <video src="${basePath}${file}" controls></video>
+                <p><a href="${basePath}${file}" target="_blank">${file}</a></p>
+            `;
+            container.appendChild(videoDiv);
         });
     </script>
 </body>
