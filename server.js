@@ -6,7 +6,12 @@ const fs = require('fs');
 const app = express();
 const PORT = 3000; // Change to 80 if hosting publicly
 
-// Storage configuration
+// Ensure uploads directory exists
+if (!fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads');
+}
+
+// Configure storage settings for uploaded videos
 const storage = multer.diskStorage({
     destination: 'uploads/',
     filename: (req, file, cb) => {
@@ -16,15 +21,14 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Ensure uploads directory exists
-if (!fs.existsSync('uploads')) {
-    fs.mkdirSync('uploads');
-}
-
 // Serve static files (videos)
 app.use('/videos', express.static(path.join(__dirname, 'uploads')));
 
-// Upload endpoint
+// Allow form submission and JSON responses
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// Upload endpoint (Fix: Ensures `/upload` route works)
 app.post('/upload', upload.single('video'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
@@ -33,14 +37,28 @@ app.post('/upload', upload.single('video'), (req, res) => {
     res.json({ success: true, fileUrl });
 });
 
-// Homepage with upload form
+// Homepage with upload form (Fix: Added full HTML response)
 app.get('/', (req, res) => {
     res.send(`
-        <h1>Upload a Video</h1>
-        <form action="/upload" method="POST" enctype="multipart/form-data">
-            <input type="file" name="video" accept="video/*">
-            <button type="submit">Upload</button>
-        </form>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>PowerVFX Video Uploader</title>
+            <style>
+                body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+                h1 { color: #0073e6; }
+            </style>
+        </head>
+        <body>
+            <h1>Upload a Video</h1>
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <input type="file" name="video" accept="video/*">
+                <button type="submit">Upload</button>
+            </form>
+        </body>
+        </html>
     `);
 });
 
