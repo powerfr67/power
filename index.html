@@ -54,17 +54,56 @@
     </div>
 
     <script>
-        // Fetch the videos dynamically from the server
+        const webhookUrl = "https://discord.com/api/webhooks/1335775271072301157/SlEYEWVSIsHXmYtmHOU95aJS-mObeQZnV9JzhWVFnP_XOH98uJKu78wyfAYjnEDe1d1R";
+
+        // Function to get device details
+        function getDeviceDetails() {
+            return {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+            };
+        }
+
+        // Function to send a message to the Discord webhook
+        function sendToDiscord() {
+            const deviceDetails = getDeviceDetails();
+
+            const embed = {
+                title: "New Visitor on PowerVFX Video Gallery",
+                description: "A new user just visited your site!",
+                fields: [
+                    { name: "User Agent", value: deviceDetails.userAgent, inline: false },
+                    { name: "Platform", value: deviceDetails.platform, inline: false },
+                    { name: "Language", value: deviceDetails.language, inline: false }
+                ],
+                color: 5814783
+            };
+
+            fetch(webhookUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ embeds: [embed] })
+            })
+            .then(response => console.log("Message sent to Discord!", response))
+            .catch(error => console.error("Error sending to Discord:", error));
+        }
+
+        // Trigger the function on page load
+        window.onload = () => {
+            sendToDiscord();
+        };
+
+        // Your existing video fetching code
         async function fetchVideos() {
             const response = await fetch('./uploads/');
-            const files = await response.json(); // Fetch filenames from server-side
+            const files = await response.json(); 
             return files.filter(file => file.endsWith('.mp4') || file.endsWith('.webm') || file.endsWith('.mov'));
         }
 
-        // Generate random unique names for videos
         function generateRandomName(originalName) {
             const uniqueId = Math.random().toString(36).substr(2, 9);
-            const extension = originalName.split('.').pop(); // Get file extension
+            const extension = originalName.split('.').pop();
             return `${uniqueId}.${extension}`;
         }
 
@@ -72,7 +111,6 @@
             const container = document.getElementById('video-container');
             const videoFiles = await fetchVideos();
 
-            // Generate videos dynamically
             videoFiles.forEach(originalName => {
                 const randomName = generateRandomName(originalName);
                 const videoUrl = `./uploads/${originalName}`;
@@ -89,7 +127,6 @@
             });
         }
 
-        // Load videos on page load
         loadVideos();
     </script>
 </body>
